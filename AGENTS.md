@@ -70,6 +70,8 @@ bash scripts/package-skill.sh
 
 - Style changes must update `references/design.md` and the matching template tokens.
 - Content changes should avoid CSS churn unless layout behavior is part of the task.
+- For document or template tasks, lock the output contract before editing: language, template, output format, page or length target, visual acceptance check, and verification command.
+- Prefer the nearest existing template and deterministic verifier. Do not add a template, stabilizer profile, shared CSS layer, dependency, script flag, or optional mode unless the current request cannot be satisfied without it.
 - New templates should copy the nearest existing template, stay aligned with `references/design.md`, and add demo coverage.
 - Stabilizer changes should update `references/stabilizer_profiles.json` with deterministic, target-specific rules rather than hard-coded one-off behavior.
 - Do not use graphic emoticons in docs, template comments, or script output.
@@ -86,6 +88,7 @@ bash scripts/package-skill.sh
 
 - When refactoring `scripts/build.py`, `scripts/stabilize.py`, or package helpers into new modules, confirm every new helper file is tracked by Git. `scripts/package-skill.sh` packages from `git ls-files`, so untracked modules pass local imports but disappear from `dist/kami.zip`.
 - Any source change that adds scripts, templates, reference JSON, workflows, or package inputs must refresh and inspect `dist/kami.zip`; package freshness is part of release readiness, not a later cleanup step.
+- Changes to `SKILL.md`, templates, scripts, references, or package inputs must decide explicitly whether `dist/kami.zip` needs refresh. If the behavior is shipped through the skill package, rebuild and inspect the ZIP before handoff.
 - If `python3 scripts/build.py --verify` fails only because the host Python lacks PPTX fallback dependencies such as `python-pptx`, verify `slides` and `slides-en` from a temporary venv instead of treating the environment miss as a source regression.
 - Do not commit one-off review reports or diagnostic snapshots as durable docs. Extract stable rules into `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, or `references/` and discard the stale report.
 
