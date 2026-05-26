@@ -13,6 +13,7 @@ import importlib.util
 import io
 import sys
 import tempfile
+import zipfile
 from pathlib import Path
 
 # Make scripts/ importable when running this file directly.
@@ -38,6 +39,7 @@ from build import (  # noqa: E402
 from shared import (  # noqa: E402
     HTML_TEMPLATES,
     PARCHMENT_RGB,
+    ROOT as REPO_ROOT,
     TEMPLATES,
     build_targets,
     screen_targets,
@@ -89,6 +91,43 @@ def silently(callable_, *args, **kwargs):
     sink = io.StringIO()
     with contextlib.redirect_stdout(sink):
         return callable_(*args, **kwargs)
+
+
+# --------------------------- package archive ---------------------------
+
+PACKAGE_MAX_BYTES = 6_000_000
+PACKAGE_FORBIDDEN_EXACT = {
+    "assets/images/1.png",
+    "assets/images/2.png",
+    "assets/images/3.png",
+    "assets/fonts/TsangerJinKai02-W04.ttf",
+    "assets/fonts/TsangerJinKai02-W05.ttf",
+}
+
+
+def test_dist_package_contents() -> None:
+    archive = REPO_ROOT / "dist" / "kami.zip"
+    check("dist/kami.zip exists", archive.exists(), f"missing {archive}")
+    if not archive.exists():
+        return
+
+    size_bytes = archive.stat().st_size
+    check("dist/kami.zip stays below 6MB",
+          size_bytes <= PACKAGE_MAX_BYTES,
+          f"{size_bytes} bytes > {PACKAGE_MAX_BYTES} bytes")
+
+    with zipfile.ZipFile(archive) as zf:
+        names = set(zf.namelist())
+
+    forbidden = sorted(
+        name for name in names
+        if name.startswith("assets/showcase/") or name in PACKAGE_FORBIDDEN_EXACT
+    )
+    check("dist/kami.zip excludes showcase screenshots and commercial fonts",
+          not forbidden,
+          f"forbidden entries: {', '.join(forbidden)}")
+    check("dist/kami.zip keeps logo.svg",
+          "assets/images/logo.svg" in names)
 
 
 # --------------------------- shared registry ---------------------------
@@ -731,6 +770,7 @@ def test_highlight_without_pygments_dependency() -> None:
 
 
 def main() -> int:
+    test_dist_package_contents()
     test_registry_consistency()
     test_chinese_html_templates_keep_single_serif_stack()
     test_chinese_slides_mono_has_cjk_fallback()
