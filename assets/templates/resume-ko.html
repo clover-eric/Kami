@@ -85,9 +85,10 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    padding-bottom: 3mm;
     margin-bottom: 3mm;
-    border-bottom: 0.5pt solid #e3baa9;
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
   }
   .header > div:first-child { flex-shrink: 0; }
   .name {
@@ -124,6 +125,8 @@
   }
   .contact a { color: var(--dark-warm); }
   .contact .loc { color: var(--olive); font-weight: 500; }
+  .contact .role { color: var(--brand); font-size: 10.5pt; font-weight: 500; }
+  .contact .sep { color: var(--border); margin: 0 0.4em; }
 
   /* METRICS */
   .metrics { display: flex; gap: 6mm; margin-bottom: 3mm; margin-left: 0; margin-right: 0; }
@@ -516,7 +519,17 @@
     <div class="name serif">{{성명}}<span class="alias">{{별명/영문명}}</span></div>
   </div>
   <div class="contact">
-    <span style="color: var(--brand); font-size: 10.5pt; font-weight: 500;">{{포지션, 예: "AI / 에이전트 엔지니어링"}}</span>　·　<a href="{{GITHUB_URL}}">GitHub @{{GITHUB_ID}}</a>　·　<a href="{{X_URL}}">X @{{X_ID}}</a>　·　<a href="tel:{{PHONE}}">{{PHONE}}</a>　·　<a href="mailto:{{EMAIL}}">{{EMAIL}}</a>　·　{{나이}}세, {{도시}}
+    <span class="role">{{포지션, 예: "AI / 에이전트 엔지니어링"}}</span>
+    <br>
+    <a href="{{GITHUB_URL}}">GitHub @{{GITHUB_ID}}</a>
+    <span class="sep">·</span>
+    <a href="{{X_URL}}">X @{{X_ID}}</a>
+    <span class="sep">·</span>
+    <a href="tel:{{PHONE}}">{{PHONE}}</a>
+    <span class="sep">·</span>
+    <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+    <span class="sep">·</span>
+    <span class="loc">{{나이}}세, {{도시}}</span>
   </div>
 </div>
 
