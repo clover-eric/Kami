@@ -40,6 +40,7 @@ from shared import (  # noqa: E402
     HTML_TEMPLATES,
     PARCHMENT_RGB,
     ROOT as REPO_ROOT,
+    SCREEN_TEMPLATES,
     TEMPLATES,
     build_targets,
     screen_targets,
@@ -102,6 +103,8 @@ PACKAGE_FORBIDDEN_EXACT = {
     "assets/images/3.png",
     "assets/fonts/TsangerJinKai02-W04.ttf",
     "assets/fonts/TsangerJinKai02-W05.ttf",
+    "assets/fonts/SourceHanSerifKR-Regular.otf",
+    "assets/fonts/SourceHanSerifKR-Medium.otf",
 }
 
 
@@ -123,7 +126,7 @@ def test_dist_package_contents() -> None:
         name for name in names
         if name.startswith("assets/showcase/") or name in PACKAGE_FORBIDDEN_EXACT
     )
-    check("dist/kami.zip excludes showcase screenshots and commercial fonts",
+    check("dist/kami.zip excludes showcase screenshots and large bundled fonts",
           not forbidden,
           f"forbidden entries: {', '.join(forbidden)}")
     check("dist/kami.zip keeps logo.svg",
@@ -133,9 +136,9 @@ def test_dist_package_contents() -> None:
 # --------------------------- shared registry ---------------------------
 
 def test_registry_consistency() -> None:
-    check("HTML_TEMPLATES has 16 entries", len(HTML_TEMPLATES) == 16,
+    check("HTML_TEMPLATES has 24 entries", len(HTML_TEMPLATES) == 24,
           f"got {len(HTML_TEMPLATES)}")
-    check("SCREEN_TARGETS has 2 entries", len(SCREEN_TARGETS) == 2,
+    check("SCREEN_TARGETS has 3 entries", len(SCREEN_TARGETS) == 3,
           f"got {len(SCREEN_TARGETS)}")
     check("build_targets matches HTML_TEMPLATES key set",
           set(build_targets()) == set(HTML_TEMPLATES))
@@ -378,13 +381,31 @@ def test_check_placeholders_passes_clean() -> None:
 # --------------------------- cross-template consistency ---------------------------
 
 def test_pair_names_includes_known_pairs() -> None:
-    pairs = dict(_pair_names())
-    check("pair_names includes one-pager", pairs.get("one-pager") == "one-pager-en",
-          f"got {pairs.get('one-pager')!r}")
-    check("pair_names includes landing-page", pairs.get("landing-page") == "landing-page-en",
-          f"got {pairs.get('landing-page')!r}")
+    captured = list(_pair_names())
+    check("pair_names includes one-pager",
+          ("one-pager", "one-pager-en") in captured,
+          f"got {[v for b, v in captured if b == 'one-pager']!r}")
+    check("pair_names includes landing-page (CN/EN)",
+          ("landing-page", "landing-page-en") in captured,
+          f"got {[v for b, v in captured if b == 'landing-page']!r}")
     check("pair_names omits lone -en entries",
           not any(name.endswith("-en") for name, _ in _pair_names()))
+
+
+def test_pair_names_includes_ko_variants_when_present() -> None:
+    """`_pair_names` must yield (base, base-ko) pairs in addition to (base, base-en)."""
+    captured = list(_pair_names())
+    # Sanity: existing CN/EN pairs still detected.
+    check("CN/EN pair still detected", ("one-pager", "one-pager-en") in captured)
+    # Any base whose `-ko` sibling is registered must appear as a (base, base-ko) pair.
+    bases = {base for base, _ in captured}
+    seen = set(HTML_TEMPLATES) | set(SCREEN_TEMPLATES)
+    missing = [
+        base for base in bases
+        if f"{base}-ko" in seen and (base, f"{base}-ko") not in captured
+    ]
+    check("pair_names includes ko variants when present", not missing,
+          f"unpaired KO bases: {missing}")
 
 
 def test_cross_template_consistency_clean() -> None:
@@ -786,6 +807,7 @@ def main() -> int:
     test_check_placeholders_flags_unfilled()
     test_check_placeholders_passes_clean()
     test_pair_names_includes_known_pairs()
+    test_pair_names_includes_ko_variants_when_present()
     test_cross_template_consistency_clean()
     test_extract_root_vars_picks_up_definitions()
     test_clamp_basic()

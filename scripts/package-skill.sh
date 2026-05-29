@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="${1:-"$ROOT/dist/kami.zip"}"
 PACKAGE_MAX_BYTES="${KAMI_PACKAGE_MAX_BYTES:-6000000}"
-PACKAGE_FORBIDDEN_RE='^(assets/showcase/|assets/images/[123]\.png$|assets/fonts/TsangerJinKai02-W0[45]\.ttf$)'
+PACKAGE_FORBIDDEN_RE='^(assets/showcase/|assets/images/[123]\.png$|assets/fonts/TsangerJinKai02-W0[45]\.ttf$|assets/fonts/SourceHanSerifKR-(Regular|Medium)\.otf$)'
 PACKAGE_REQUIRED_ENTRY='assets/images/logo.svg'
 
 mkdir -p "$(dirname "$OUT")"
@@ -19,6 +19,7 @@ trap 'rm -f "$MANIFEST" "$FILTERED_MANIFEST"' EXIT
 git ls-files > "$MANIFEST"
 awk '
   /^assets\/fonts\/TsangerJinKai02-W0[45]\.ttf$/ { next }
+  /^assets\/fonts\/SourceHanSerifKR-(Regular|Medium)\.otf$/ { next }
   /^assets\/examples\// { next }
   /^assets\/illustrations\// { next }
   /^assets\/showcase\// { next }

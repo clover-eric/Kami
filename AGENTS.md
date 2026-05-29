@@ -33,7 +33,7 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `llms.txt` - AI crawler and model-facing project summary.
 - `scripts/build.py` - CLI shell: build targets and dispatch to lint / verify / checks / tokens modules.
 - `scripts/verify.py` - end-to-end render verification (page count, embedded fonts, advisory density scan).
-- `scripts/lint.py` - template CSS lint rules and CN/EN cross-template `:root` consistency check.
+- `scripts/lint.py` - template CSS lint rules and base/variant cross-template `:root` consistency check (CN↔EN and CN↔KO).
 - `scripts/tokens.py` - `tokens.json` drift check across HTML templates and PPTX slide scripts.
 - `scripts/checks.py` - PDF-side checks: placeholders, orphans, density, slide-deck rhythm.
 - `scripts/optional_deps.py` - centralized loader for weasyprint / pypdf / PyMuPDF with consistent install hints.
@@ -47,7 +47,7 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `.github/workflows/release.yml` - tag-triggered workflow that builds and attaches `dist/kami.zip` to the release.
 - `dist/kami.zip` - tracked release archive.
 
-Reference docs are English-only. Language-specific output differences belong in templates, not duplicated reference files.
+Reference docs are English-only. Language-specific output differences (CN/EN/KO) belong in templates, not duplicated reference files.
 
 ## Commands
 
@@ -153,7 +153,7 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 
 ## Verification
 
-- Template, CSS, or script changes: run `python3 scripts/build.py --check` (CSS lint + token sync + CN/EN cross-template `:root` consistency) and `python3 scripts/build.py --verify`.
+- Template, CSS, or script changes: run `python3 scripts/build.py --check` (CSS lint + token sync + base/variant cross-template `:root` consistency, currently CN↔EN and CN↔KO) and `python3 scripts/build.py --verify`.
 - HTML stabilization changes: run `python3 scripts/stabilize.py all --report` and inspect generated files under `dist/stabilized/` or the requested output directory.
 - Demo changes: regenerate the affected demo outputs and confirm page counts stay in range.
 - Font issues: run `bash scripts/ensure-fonts.sh`, then rebuild the affected target.
@@ -178,4 +178,5 @@ For public releases, keep notes concise and bilingual when requested. Use one-to
 - Chinese templates use TsangerJinKai02 W04/W05. Commercial use requires the appropriate font license.
 - If TsangerJinKai is unavailable, fall back through Source Han Serif SC, Noto Serif CJK SC, Songti SC, STSong, then Georgia.
 - English templates use Charter serif. Japanese output uses YuMincho first, then Hiragino Mincho ProN, Noto Serif CJK JP, Source Han Serif JP, TsangerJinKai02, and generic serif.
-- Claude Desktop ZIPs do not bundle TsangerJinKai TTF files. Run `bash scripts/ensure-fonts.sh` before building Chinese documents when fonts are missing; it drops them in the XDG user font dir (fontconfig-scanned, outside the skill), so the installed skill stays small and online renders still use the jsDelivr `@font-face` fallback.
+- Korean templates use Source Han Serif K (Adobe, also distributed as Noto Serif KR by Google). Fallback chain: Source Han Serif K, Noto Serif KR, Apple SD Gothic Neo, AppleMyungjo, Charter, Georgia.
+- Claude Desktop ZIPs do not bundle TsangerJinKai TTF or Source Han Serif K OTF files (the OTFs are OFL-licensed and git-tracked for the CDN `@font-face` fallback, but excluded from the package to keep it small). Run `bash scripts/ensure-fonts.sh` before building Chinese or Korean documents when fonts are missing; it drops them in the XDG user font dir (fontconfig-scanned, outside the skill), so the installed skill stays small and online renders still use the jsDelivr `@font-face` fallback.
