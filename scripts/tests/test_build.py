@@ -901,6 +901,39 @@ def test_highlight_without_pygments_dependency() -> None:
           f"warning: {warning.getvalue()}")
 
 
+def test_marp_themes_token_synced() -> None:
+    """Marp theme CSS keeps its :root tokens in sync with tokens.json.
+
+    Locks the invariant AGENTS.md documents (tokens.py globs marp/*.css), so the
+    Marp decks cannot silently drift even if that glob is later refactored away.
+    """
+    import json
+    from shared import TOKENS_FILE
+    from tokens import CSS_VAR, ROOT_BLOCK
+
+    canonical = {k.lstrip("-"): v.strip().lower()
+                 for k, v in json.loads(TOKENS_FILE.read_text(encoding="utf-8")).items()}
+    marp_files = sorted((TEMPLATES / "marp").glob("*.css"))
+    check("marp theme CSS present", len(marp_files) >= 1, f"found {len(marp_files)} file(s)")
+
+    drift: list[str] = []
+    checked = 0
+    for path in marp_files:
+        block = ROOT_BLOCK.search(path.read_text(encoding="utf-8", errors="replace"))
+        if not block:
+            continue
+        checked += 1
+        found = {m.group(1): m.group(2).strip().lower()
+                 for m in CSS_VAR.finditer(block.group(1))}
+        for name, expected in canonical.items():
+            actual = found.get(name)
+            if actual is not None and actual != expected:
+                drift.append(f"{path.name}: --{name} expected {expected}, got {actual}")
+    check("marp theme :root tokens match tokens.json",
+          checked >= 1 and not drift,
+          "; ".join(drift) if drift else f"checked {checked}, no :root block found")
+
+
 def main() -> int:
     test_dist_package_contents()
     test_registry_consistency()
@@ -925,6 +958,7 @@ def main() -> int:
     test_pair_names_includes_known_pairs()
     test_pair_names_includes_ko_variants_when_present()
     test_cross_template_consistency_clean()
+    test_marp_themes_token_synced()
     test_extract_root_vars_picks_up_definitions()
     test_clamp_basic()
     test_parse_hex_3_and_6()

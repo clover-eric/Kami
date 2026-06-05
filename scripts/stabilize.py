@@ -49,7 +49,6 @@ BODY_BLOCK_RE = re.compile(r"(^[ \t]*body[ \t]*\{)(?P<body>.*?)(^[ \t]*\})", re.
 SECTION_BLOCK_RE = re.compile(r"(^[ \t]*section[ \t]*\{)(?P<body>.*?)(^[ \t]*\})", re.DOTALL | re.MULTILINE)
 PAGE_BLOCK_RE = re.compile(r"(^[ \t]*@page[ \t]*\{)(?P<body>.*?)(^[ \t]*\})", re.DOTALL | re.MULTILINE)
 
-CSS_VAR_RE = re.compile(r"(--[\w-]+\s*:\s*)([^;]+)(;)")
 RGBA_RE = re.compile(
     r"rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*((?:\d*\.\d+)|\d+)\s*\)",
     re.IGNORECASE,

@@ -352,7 +352,7 @@ def main(argv: list[str]) -> int:
         return check_orphans(args[1:])
     if args[0] == "--check-density":
         return check_density(args[1:])
-    if args[0] in ("--check-placeholders", "--verify-filled"):
+    if args[0] == "--check-placeholders":
         return check_placeholders(args[1:])
     if args[0] == "--check-rhythm":
         slide_targets = [a for a in args[1:] if not a.startswith("-")]
