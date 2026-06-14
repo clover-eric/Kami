@@ -55,9 +55,9 @@ Eight real PDFs across templates and languages. Click any preview to open it.
     <br><sub>推荐信, 1 页</sub>
   </td>
   <td align="center" width="25%">
-    <a href="assets/demos/demo-changelog.pdf"><img src="assets/demos/demo-changelog.png" alt="Kami release notes"></a>
+    <a href="assets/demos/demo-changelog.pdf"><img src="assets/demos/demo-changelog.png" alt="Mole release notes"></a>
     <br><b>Changelog</b> · English
-    <br><sub>Kami v2.0 release notes</sub>
+    <br><sub>Mole v1.7.1 release notes</sub>
   </td>
   <td align="center" width="25%">
     <a href="assets/demos/demo-kaku.pdf"><img src="assets/demos/demo-kaku.png" alt="Kaku portfolio"></a>
